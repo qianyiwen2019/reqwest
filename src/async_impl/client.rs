@@ -2378,7 +2378,10 @@ impl Future for PendingRequest {
                             let mut headers =
                                 std::mem::replace(self.as_mut().headers(), HeaderMap::new());
 
-                            remove_sensitive_headers(&mut headers, &self.url, &self.urls);
+                            #[cfg(not(feature = "redirect-with-sensitive-headers"))]
+                            {
+                                remove_sensitive_headers(&mut headers, &self.url, &self.urls);
+                            }
                             let uri = expect_uri(&self.url);
                             let body = match self.body {
                                 Some(Some(ref body)) => Body::reusable(body.clone()),
